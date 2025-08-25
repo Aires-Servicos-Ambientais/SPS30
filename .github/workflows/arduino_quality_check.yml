@@ -7,12 +7,10 @@ on:
       - main
 
 jobs:
-  arduino-check:
-    uses: sensirion/.github/.github/workflows/shared.arduino.check.yml@main
+  arduino-quality:
+    uses: sensirion/.github/.github/workflows/driver.arduino.check.yml@main
     with:
-      lint-lib-manager-check: submit
-      fqbn-list: "['arduino:avr:mega','esp32:esp32:esp32']"
-      dependency-list: "auto"
+      expect-arduino-examples: true
+      lint-lib-manager-check: update
 
-  code-generation-check:
-    uses: sensirion/.github/.github/workflows/driver.generated.metadata_check.yml@main
+  
