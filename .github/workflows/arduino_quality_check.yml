@@ -12,5 +12,5 @@ jobs:
     with:
       expect-arduino-examples: true
       lint-lib-manager-check: submit
-
-  
+      fqbn-list: "['arduino:avr:mega','esp32:esp32:esp32']"
+      dependency-list: "auto"  
