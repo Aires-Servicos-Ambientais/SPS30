@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Changed start_measurement example-value to enum
+- Added float example
 ## [1.0.0] - 2025-8-25
 
 ### Added
