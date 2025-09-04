@@ -41,6 +41,7 @@
 
 #include "Arduino.h"
 #include <SensirionCore.h>
+#include <queue>
 
 #define SPS30_SHDLC_ADDR 0x00
 

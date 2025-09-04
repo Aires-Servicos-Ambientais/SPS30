@@ -165,9 +165,9 @@ int16_t SensirionUartSps30::readMeasurementValuesFloat(
     localError |= rxFrame.getFloat(nc10p0);
     localError |= rxFrame.getFloat(typicalParticleSize);
 
-    this->enqueue(PM1_INDEX, this->gasMicrogram);
-    this->enqueue(PM25_INDEX, this->gasMicrogram);
-    this->enqueue(PM10_INDEX, this->gasMicrogram);
+    this->enqueue(PM1_INDEX, this->PM1);
+    this->enqueue(PM25_INDEX, this->PM25);
+    this->enqueue(PM10_INDEX, this->PM10);
 
     return localError;
 }
@@ -436,7 +436,7 @@ float SensirionUartSps30::getPM25(bool rooling) {
     return this->values[PM25_INDEX];
 }
 
-float SensirionUartSps30::getMicrogram(bool rooling) {
+float SensirionUartSps30::getPM10(bool rooling) {
     if (!rolling)
         return this->PM10;
 
