@@ -409,7 +409,7 @@ void SensirionUartSps30::begin(Stream& serial) {
     _serial = &serial;
 }
 
-void Semeatech::enqueue(SPS30_INDEXES index, float value) {
+void SensirionUartSps30::enqueue(SPS30_INDEXES index, float value) {
     this->instant[index] = value;
     this->totals[index] += value;
     this->rolling[index].push(value);
@@ -422,21 +422,21 @@ void Semeatech::enqueue(SPS30_INDEXES index, float value) {
     this->values[index] = this->totals[index]/this->rolling[index].size();
 }
 
-float Semeatech::getPM1(bool rooling) {
+float SensirionUartSps30::getPM1(bool rooling) {
     if (!rolling)
         return this->PM1;
 
     return this->values[PM1_INDEX];
 }
 
-float Semeatech::getPM25(bool rooling) {
+float SensirionUartSps30::getPM25(bool rooling) {
     if (!rolling)
         return this->PM25;
 
     return this->values[PM25_INDEX];
 }
 
-float Semeatech::getMicrogram(bool rooling) {
+float SensirionUartSps30::getMicrogram(bool rooling) {
     if (!rolling)
         return this->PM10;
 
