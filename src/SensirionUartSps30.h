@@ -67,9 +67,21 @@ typedef enum {
     SPS30_OUTPUT_FORMAT_OUTPUT_FORMAT_UINT16 = 261,
 } SPS30OutputFormat;
 
+enum SPS30_INDEXES {
+    PM1_INDEX = 0,
+    PM25_INDEX,
+    PM10_INDEX
+} typedef SPS30_INDEXES;
+
 class SensirionUartSps30 {
   public:
-    SensirionUartSps30();
+    SensirionUartSps30(int average_samples=6);
+
+    void enqueue(SPS30_INDEXES index, float value);
+    float getPM1(bool rooling=false);
+    float getPM25(bool rooling=false);
+    float getPM10(bool rooling=false);
+
     /**
      * @brief Initializes the SPS30 class.
      *
@@ -329,6 +341,15 @@ class SensirionUartSps30 {
     int16_t deviceReset();
 
   private:
+
+    float PM1;
+    float PM25;
+    float PM10;
+
+    int max_samples;
+    float instant[4], values[4], totals[4];
+    std::queue<float> rolling[4];
+      
     Stream* _serial = nullptr;
 };
 

@@ -47,7 +47,7 @@
 
 static uint8_t communication_buffer[44] = {0};
 
-SensirionUartSps30::SensirionUartSps30() {
+SensirionUartSps30::SensirionUartSps30(int average_samples) {
 }
 
 int16_t SensirionUartSps30::wakeUpSequence() {
@@ -136,7 +136,7 @@ int16_t SensirionUartSps30::readMeasurementValuesUint16(
 }
 
 int16_t SensirionUartSps30::readMeasurementValuesFloat(
-    float& mc1p0, float& mc2p5, float& mc4p0, float& mc10p0, float& nc0p5,
+    float& PM1, float& PM25, float& mc4p0, float& PM10, float& nc0p5,
     float& nc1p0, float& nc2p5, float& nc4p0, float& nc10p0,
     float& typicalParticleSize) {
 
@@ -154,16 +154,21 @@ int16_t SensirionUartSps30::readMeasurementValuesFloat(
     if (localError) {
         return localError;
     }
-    localError |= rxFrame.getFloat(mc1p0);
-    localError |= rxFrame.getFloat(mc2p5);
+    localError |= rxFrame.getFloat(this->PM1);
+    localError |= rxFrame.getFloat(this->PM25);
     localError |= rxFrame.getFloat(mc4p0);
-    localError |= rxFrame.getFloat(mc10p0);
+    localError |= rxFrame.getFloat(this->PM10);
     localError |= rxFrame.getFloat(nc0p5);
     localError |= rxFrame.getFloat(nc1p0);
     localError |= rxFrame.getFloat(nc2p5);
     localError |= rxFrame.getFloat(nc4p0);
     localError |= rxFrame.getFloat(nc10p0);
     localError |= rxFrame.getFloat(typicalParticleSize);
+
+    this->enqueue(PM1_INDEX, this->gasMicrogram);
+    this->enqueue(PM25_INDEX, this->gasMicrogram);
+    this->enqueue(PM10_INDEX, this->gasMicrogram);
+
     return localError;
 }
 
@@ -402,4 +407,38 @@ int16_t SensirionUartSps30::deviceReset() {
 
 void SensirionUartSps30::begin(Stream& serial) {
     _serial = &serial;
+}
+
+void Semeatech::enqueue(SPS30_INDEXES index, float value) {
+    this->instant[index] = value;
+    this->totals[index] += value;
+    this->rolling[index].push(value);
+
+    if (this->rolling[index].size() > this->max_samples) {
+        this->totals[index] -= this->rolling[index].front();
+        this->rolling[index].pop();
+    }
+
+    this->values[index] = this->totals[index]/this->rolling[index].size();
+}
+
+float Semeatech::getPM1(bool rooling) {
+    if (!rolling)
+        return this->PM1;
+
+    return this->values[PM1_INDEX];
+}
+
+float Semeatech::getPM25(bool rooling) {
+    if (!rolling)
+        return this->PM25;
+
+    return this->values[PM25_INDEX];
+}
+
+float Semeatech::getMicrogram(bool rooling) {
+    if (!rolling)
+        return this->PM10;
+
+    return this->values[PM10_INDEX];
 }
