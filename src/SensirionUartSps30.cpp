@@ -48,6 +48,11 @@
 static uint8_t communication_buffer[44] = {0};
 
 SensirionUartSps30::SensirionUartSps30(int average_samples) {
+    for (int i=0; i<7; i++) {
+        this->totals[i] = 0.0;
+        this->values[i] = 0.0;
+        this->instant[i] = 0.0;
+    }
 }
 
 int16_t SensirionUartSps30::wakeUpSequence() {
@@ -137,9 +142,9 @@ int16_t SensirionUartSps30::readMeasurementValuesUint16(
 
 int16_t SensirionUartSps30::readMeasurementValuesFloat(
     float& PM1, float& PM25, float& mc4p0, float& PM10, float& nc0p5,
-    float& nc1p0, float& nc2p5, float& nc4p0, float& nc10p0,
-    float& typicalParticleSize) {
-
+    float& NC1, float& NC25, float& nc4p0, float& NC10,
+    float& TPS) {
+    
     int16_t localError = NO_ERROR;
     uint8_t* buffer_ptr = communication_buffer;
     SensirionShdlcTxFrame txFrame(buffer_ptr, 44);
@@ -154,20 +159,25 @@ int16_t SensirionUartSps30::readMeasurementValuesFloat(
     if (localError) {
         return localError;
     }
+
     localError |= rxFrame.getFloat(this->PM1);
     localError |= rxFrame.getFloat(this->PM25);
     localError |= rxFrame.getFloat(mc4p0);
     localError |= rxFrame.getFloat(this->PM10);
     localError |= rxFrame.getFloat(nc0p5);
-    localError |= rxFrame.getFloat(nc1p0);
-    localError |= rxFrame.getFloat(nc2p5);
+    localError |= rxFrame.getFloat(this->NC1);
+    localError |= rxFrame.getFloat(this->NC25);
     localError |= rxFrame.getFloat(nc4p0);
-    localError |= rxFrame.getFloat(nc10p0);
-    localError |= rxFrame.getFloat(typicalParticleSize);
+    localError |= rxFrame.getFloat(this->NC10);
+    localError |= rxFrame.getFloat(this->TPS);
 
     this->enqueue(PM1_INDEX, this->PM1);
     this->enqueue(PM25_INDEX, this->PM25);
     this->enqueue(PM10_INDEX, this->PM10);
+    this->enqueue(NC1_INDEX, this->NC1);
+    this->enqueue(NC25_INDEX, this->NC25);
+    this->enqueue(NC10_INDEX, this->NC10);
+    this->enqueue(TPS_INDEX, this->TPS);
 
     return localError;
 }
@@ -441,4 +451,32 @@ float SensirionUartSps30::getPM10(bool rooling) {
         return this->PM10;
 
     return this->values[PM10_INDEX];
+}
+
+float SensirionUartSps30::getNC1(bool rooling) {
+    if (!rolling)
+        return this->NC1;
+
+    return this->values[NC1_INDEX];
+}
+
+float SensirionUartSps30::getNC25(bool rooling) {
+    if (!rolling)
+        return this->NC25;
+
+    return this->values[NC25_INDEX];
+}
+
+float SensirionUartSps30::getNC10(bool rooling) {
+    if (!rolling)
+        return this->NC10;
+
+    return this->values[NC10_INDEX];
+}
+
+float SensirionUartSps30::getTPS(bool rooling) {
+    if (!rolling)
+        return this->TPS;
+
+    return this->values[TPS_INDEX];
 }

@@ -71,7 +71,11 @@ typedef enum {
 enum SPS30_INDEXES {
     PM1_INDEX = 0,
     PM25_INDEX,
-    PM10_INDEX
+    PM10_INDEX,
+    NC1_INDEX,
+    NC25_INDEX,
+    NC10_INDEX,
+    TPS_INDEX
 } typedef SPS30_INDEXES;
 
 class SensirionUartSps30 {
@@ -79,9 +83,14 @@ class SensirionUartSps30 {
     SensirionUartSps30(int average_samples=6);
 
     void enqueue(SPS30_INDEXES index, float value);
+
     float getPM1(bool rooling=false);
     float getPM25(bool rooling=false);
     float getPM10(bool rooling=false);
+    float getNC1(bool rooling=false);
+    float getNC25(bool rooling=false);
+    float getNC10(bool rooling=false);
+    float getTPS(bool rooling=false);
 
     /**
      * @brief Initializes the SPS30 class.
@@ -346,11 +355,14 @@ class SensirionUartSps30 {
     float PM1;
     float PM25;
     float PM10;
+    float NC1;
+    float NC25;
+    float NC10;
+    float TPS;
 
     int max_samples;
-    float instant[4], values[4], totals[4];
-    std::queue<float> rolling[4];
-      
+    float instant[7], values[7], totals[7];
+    std::queue<float> rolling[7];
     Stream* _serial = nullptr;
 };
 
